@@ -1,7 +1,7 @@
 package config;
 
+import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.command.ActiveMQQueue;
-import org.apache.activemq.spring.ActiveMQConnectionFactory;
 import org.apache.tomcat.jdbc.pool.DataSource;
 import org.apache.tomcat.jdbc.pool.PoolProperties;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +19,8 @@ import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
-import javasrc.listener.ConsumerMessageListener;
+import javasrc.listener.FirstQueueListener;
+import javasrc.listener.SecondQueueListener;
 
 
 @Configuration
@@ -56,11 +57,11 @@ public class WebConfig extends WebMvcConfigurerAdapter {
         DataSource datasource = new DataSource();
         datasource.setPoolProperties(p);
 		return datasource;
-	}
+	}*/
 	
-	*//**
-	 * 配置spring jdbc模板*//*
-	@Bean
+	/**
+	 * 配置spring jdbc模板*/
+	/*@Bean
 	public JdbcTemplate getJdbcTemplate(){
 		System.out.println("配置JdbcTemplate。");
 		JdbcTemplate jdbcTemplate=new JdbcTemplate();
@@ -95,26 +96,52 @@ public class WebConfig extends WebMvcConfigurerAdapter {
 	}
 	
 	@Bean
-	public ActiveMQQueue getActiveMQQueue(){
-		System.out.println("初始化activeMQQueue。");
-		ActiveMQQueue activeMQQueue=new ActiveMQQueue("queue");
+	public ActiveMQQueue getFirstQueue(){
+		System.out.println("初始化队列1。");
+		String queuename="queue1";
+		ActiveMQQueue activeMQQueue=new ActiveMQQueue(queuename);
 		return activeMQQueue;
 	}
 	
 	@Bean
-	public ConsumerMessageListener getConsumerMessageListener(){
-		System.out.println("初始化consumerMessageListener。");
-		ConsumerMessageListener consumerMessageListener=new ConsumerMessageListener();
+	public FirstQueueListener getFirstQueueListener(){
+		System.out.println("初始化队列1Listener。");
+		FirstQueueListener consumerMessageListener=new FirstQueueListener();
 		return consumerMessageListener;
 	}
 	
 	@Bean
-	public DefaultMessageListenerContainer getDefaultMessageListenerContainer(){
-		System.out.println("初始化jmsContainer。");
+	public DefaultMessageListenerContainer getFirstQueueListenerContainer(){
+		System.out.println("初始化队列1ListenerContainer。");
 		DefaultMessageListenerContainer defaultMessageListenerContainer=new DefaultMessageListenerContainer();
 		defaultMessageListenerContainer.setConnectionFactory(getSingleConnectionFactory());
-		defaultMessageListenerContainer.setDestination(getActiveMQQueue());
-		defaultMessageListenerContainer.setMessageListener(getConsumerMessageListener());
+		defaultMessageListenerContainer.setDestination(getFirstQueue());
+		defaultMessageListenerContainer.setMessageListener(getFirstQueueListener());
+		return defaultMessageListenerContainer;
+	}
+	
+	@Bean
+	public ActiveMQQueue getSecondQueue(){
+		System.out.println("初始化队列2。");
+		String queuename="queue2";
+		ActiveMQQueue activeMQQueue=new ActiveMQQueue(queuename);
+		return activeMQQueue;
+	}
+	
+	@Bean
+	public SecondQueueListener getSecondQueueListener(){
+		System.out.println("初始化队列2Listener。");
+		SecondQueueListener secondQueueListener=new SecondQueueListener();
+		return secondQueueListener;
+	}
+	
+	@Bean
+	public DefaultMessageListenerContainer getSecondQueueListenerContainer(){
+		System.out.println("初始化队列2ListenerContainer。");
+		DefaultMessageListenerContainer defaultMessageListenerContainer=new DefaultMessageListenerContainer();
+		defaultMessageListenerContainer.setConnectionFactory(getSingleConnectionFactory());
+		defaultMessageListenerContainer.setDestination(getSecondQueue());
+		defaultMessageListenerContainer.setMessageListener(getSecondQueueListener());
 		return defaultMessageListenerContainer;
 	}
 }
