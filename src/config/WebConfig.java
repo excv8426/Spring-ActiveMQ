@@ -12,6 +12,7 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jms.connection.SingleConnectionFactory;
+import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.listener.DefaultMessageListenerContainer;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
@@ -95,7 +96,7 @@ public class WebConfig extends WebMvcConfigurerAdapter {
 		return singleConnectionFactory;
 	}
 	
-	@Bean
+	@Bean(name="queue1")
 	public ActiveMQQueue getFirstQueue(){
 		System.out.println("初始化队列1。");
 		String queuename="queue1";
@@ -120,7 +121,7 @@ public class WebConfig extends WebMvcConfigurerAdapter {
 		return defaultMessageListenerContainer;
 	}
 	
-	@Bean
+	@Bean(name="queue2")
 	public ActiveMQQueue getSecondQueue(){
 		System.out.println("初始化队列2。");
 		String queuename="queue2";
@@ -143,5 +144,11 @@ public class WebConfig extends WebMvcConfigurerAdapter {
 		defaultMessageListenerContainer.setDestination(getSecondQueue());
 		defaultMessageListenerContainer.setMessageListener(getSecondQueueListener());
 		return defaultMessageListenerContainer;
+	}
+	
+	@Bean
+	public JmsTemplate getJmsTemplate(){
+		JmsTemplate jmsTemplate=new JmsTemplate(getSingleConnectionFactory());
+		return jmsTemplate;
 	}
 }
